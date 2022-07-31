@@ -8,6 +8,10 @@ app.use(express.json());
 
 const port = process.env.PORT || 4000;
 
+
+//Routes
+app.use('/mf',require('./routes/manufacturerRoutes'));
+
 app.get('/',(req, res)=>{
     res.send('server is running')
 })
