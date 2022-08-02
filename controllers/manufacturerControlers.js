@@ -11,16 +11,8 @@ const client = new MongoClient(uri, {
 let serviceCollection;
 let orderCollection;
 let usersCollection;
+let reviewsCollection;
 
-const verifyAdmin=async (req, res, next)=>{
-  const email = req.query.email;
-  const user = await usersCollection.find({email: email});
-  if(user.role === "admin"){
-    req.access = true;
-  }else{
-    res.status(401).send({message: 'You Are Not Admin'})
-  }
-}
 
 module.exports = {
   dbConnection: function (req, res, next) {
@@ -29,6 +21,7 @@ module.exports = {
       serviceCollection = db.collection("services");
       orderCollection = db.collection("orders");
       usersCollection = db.collection("users");
+      reviewsCollection = db.collection("review");
       next();
     });
   },
@@ -132,5 +125,19 @@ module.exports = {
   getAllOrder: async(req, res)=>{
     const orders = await orderCollection.find({}).toArray();
     res.send(orders)
+  },
+  postReview: async(req, res)=>{
+    const review = req.body;
+    const submitedReview = await reviewsCollection.insertOne(review);
+    res.send(submitedReview)
+  },
+  getAllReview: async (req, res)=>{
+    const reviews = await reviewsCollection.find({}).toArray();
+    res.send(reviews);
+  },
+  getReviewByEmail: async (req, res)=>{
+    const email = req.params.email;
+    const review = await reviewsCollection.find({email: email}).toArray();
+    res.send(review);
   }
 };

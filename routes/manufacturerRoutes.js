@@ -12,8 +12,12 @@ const {
   updateUser,
   changeUserRole,
   getAllOrder,
+  postReview,
+  getAllReview,
+  getReviewByEmail,
 } = require("../controllers/manufacturerControlers");
 const {verifyToken} = require('../middlewares/vefiryToken');
+const verifyAdmin = require("../middlewares/verifyAdmin");
 
 const router = require("express").Router();
 
@@ -55,5 +59,14 @@ router.get('/allUser', getAllUser);
 
 //get single user from database
 router.get('/user/:email', getUser);
+
+//post review
+router.post('/addReview', verifyToken, postReview);
+
+//get all review
+router.get('/review', getAllReview);
+
+//get review by user
+router.get('/review/:email', verifyToken, getReviewByEmail);
 
 module.exports = router;
