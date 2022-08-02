@@ -6,7 +6,14 @@ const {
   availableQty,
   getOrderById,
   deleteOrderById,
+  addUser,
+  getUser,
+  getAllUser,
+  updateUser,
+  changeUserRole,
+  getAllOrder,
 } = require("../controllers/manufacturerControlers");
+const {verifyToken} = require('../middlewares/vefiryToken');
 
 const router = require("express").Router();
 
@@ -25,10 +32,28 @@ router.get("/service/:id", serviceById);
 //post order
 router.post("/createOrder", createOrder);
 
+//get all order
+router.get('/orders', getAllOrder)
+
 //get order by user
-router.get('/orders/:email', getOrderById)
+router.get('/orders/:email', verifyToken, getOrderById);
 
 //order delete by id
-router.delete('/orders/:id', deleteOrderById)
+router.delete('/orders/:id', deleteOrderById);
+
+//add or update user in database
+router.put('/addUser/:email', addUser);
+
+//update user
+router.put('/updateUser/:email', updateUser);
+
+//change user role
+router.put('/userRole/:email', changeUserRole);
+
+//get all user
+router.get('/allUser', getAllUser);
+
+//get single user from database
+router.get('/user/:email', getUser);
 
 module.exports = router;

@@ -1,4 +1,5 @@
 const { MongoClient, ObjectId } = require("mongodb");
+const jwt = require('jsonwebtoken');
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.g1juc.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -9,6 +10,17 @@ const client = new MongoClient(uri, {
 
 let serviceCollection;
 let orderCollection;
+let usersCollection;
+
+const verifyAdmin=async (req, res, next)=>{
+  const email = req.query.email;
+  const user = await usersCollection.find({email: email});
+  if(user.role === "admin"){
+    req.access = true;
+  }else{
+    res.status(401).send({message: 'You Are Not Admin'})
+  }
+}
 
 module.exports = {
   dbConnection: function (req, res, next) {
@@ -16,6 +28,7 @@ module.exports = {
       const db = client.db("tools-manufacturer");
       serviceCollection = db.collection("services");
       orderCollection = db.collection("orders");
+      usersCollection = db.collection("users");
       next();
     });
   },
@@ -55,14 +68,69 @@ module.exports = {
   },
   //get order by user email
   getOrderById: async(req, res)=>{
+    const requestedUser = req.user;
     const user = req.params.email;
-    const orders = await orderCollection.find({email: user}).toArray();
-    res.send(orders)
+    if(requestedUser.email === user){
+      const orders = await orderCollection.find({email: user}).toArray();
+      res.send(orders)
+    }else{
+      res.status(403).send({message: 'Forbidden Access'})
+    }
   },
   deleteOrderById: async(req, res)=>{
     const order = req.params.id;
     const query={_id: ObjectId(order)}
     const result = await orderCollection.deleteOne(query);
     res.send(result)
+  },
+  addUser: async(req, res)=>{
+    const email = req.params.email;
+    const user = req.body;
+    const filter = { email: email };
+    const options = { upsert: true };
+    const updatedDoc = {
+      $set: user,
+    };
+    const result = await usersCollection.updateOne(filter, updatedDoc, options);
+    const token = jwt.sign({ email: email }, process.env.SECRET, {
+      expiresIn: "2h",
+    });
+    res.send({ result, accessToken: token });
+  },
+  getUser: async(req, res)=>{
+    const email = req.params.email;
+    const query = {email: email};
+    const user = await usersCollection.findOne(query);
+    res.send(user)
+  },
+  getAllUser: async(req, res)=>{
+    const users = await usersCollection.find({}).toArray();
+    res.send(users)
+  },
+  updateUser:async(req, res)=>{
+    const email = req.params.email;
+    const user = req.body;
+    const filter = { email: email };
+    const options = { upsert: true };
+    const updatedDoc = {
+      $set: user,
+    };
+    const result = await usersCollection.updateOne(filter, updatedDoc, options);
+    res.send(result)
+  },
+  changeUserRole: async(req, res)=>{
+    const email = req.params.email;
+    const user = req.body;
+    const filter = { email: email };
+    const updatedDoc = {
+      $set: user,
+    };
+    console.log(updatedDoc)
+    const result = await usersCollection.updateOne(filter, updatedDoc);
+    res.send(result)
+  },
+  getAllOrder: async(req, res)=>{
+    const orders = await orderCollection.find({}).toArray();
+    res.send(orders)
   }
 };
