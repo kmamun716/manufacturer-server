@@ -15,6 +15,7 @@ const {
   postReview,
   getAllReview,
   getReviewByEmail,
+  postProduct,
 } = require("../controllers/manufacturerControlers");
 const {verifyToken} = require('../middlewares/vefiryToken');
 const verifyAdmin = require("../middlewares/verifyAdmin");
@@ -43,7 +44,7 @@ router.get('/orders', getAllOrder)
 router.get('/orders/:email', verifyToken, getOrderById);
 
 //order delete by id
-router.delete('/orders/:id', deleteOrderById);
+router.delete('/orders/:id', verifyToken, deleteOrderById);
 
 //add or update user in database
 router.put('/addUser/:email', addUser);
@@ -68,5 +69,8 @@ router.get('/review', getAllReview);
 
 //get review by user
 router.get('/review/:email', verifyToken, getReviewByEmail);
+
+//post product
+router.post('/addProduct', verifyToken, postProduct);
 
 module.exports = router;

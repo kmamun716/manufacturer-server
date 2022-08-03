@@ -139,5 +139,10 @@ module.exports = {
     const email = req.params.email;
     const review = await reviewsCollection.find({email: email}).toArray();
     res.send(review);
+  },
+  postProduct: async(req, res)=>{
+    const product = req.body;
+    const result = await serviceCollection.insertOne(product);
+    res.send(result)
   }
 };
