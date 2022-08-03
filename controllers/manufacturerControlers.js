@@ -28,7 +28,7 @@ module.exports = {
   //get all services
   services: async function (req, res) {
     const query = {};
-    const cursor = serviceCollection.find(query);
+    const cursor = serviceCollection.find(query).sort({_id:-1});
     const services = await cursor.toArray();
     res.send(services);
   },
