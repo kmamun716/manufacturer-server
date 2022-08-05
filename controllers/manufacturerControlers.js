@@ -1,5 +1,6 @@
 const { MongoClient, ObjectId } = require("mongodb");
 const jwt = require('jsonwebtoken');
+const stripe =require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.g1juc.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -60,7 +61,7 @@ module.exports = {
     res.send(result)
   },
   //get order by user email
-  getOrderById: async(req, res)=>{
+  getOrderByUser: async(req, res)=>{
     const requestedUser = req.user;
     const user = req.params.email;
     if(requestedUser.email === user){
@@ -69,6 +70,12 @@ module.exports = {
     }else{
       res.status(403).send({message: 'Forbidden Access'})
     }
+  },
+  getOrderById: async (req, res)=>{
+    const id = req.params.id;
+    const query = {_id: ObjectId(id)}
+    const result = await orderCollection.findOne(query);
+    res.send(result)
   },
   deleteOrderById: async(req, res)=>{
     const order = req.params.id;
@@ -144,5 +151,15 @@ module.exports = {
     const product = req.body;
     const result = await serviceCollection.insertOne(product);
     res.send(result)
+  },
+  payment: async(req, res)=>{
+    const {price} = req.body;
+    const amount = price*100;
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency: 'usd',
+      payment_method_types: ['card']
+    })
+    res.send({clientSecret: paymentIntent.client_secret})
   }
 };
