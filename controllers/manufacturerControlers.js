@@ -125,7 +125,6 @@ module.exports = {
     const updatedDoc = {
       $set: user,
     };
-    console.log(updatedDoc)
     const result = await usersCollection.updateOne(filter, updatedDoc);
     res.send(result)
   },
