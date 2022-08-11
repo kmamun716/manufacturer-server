@@ -118,6 +118,12 @@ module.exports = {
     const result = await usersCollection.updateOne(filter, updatedDoc, options);
     res.send(result)
   },
+  deleteUserById: async(req, res)=>{
+    const id = req.params.id;
+    const query = {_id: ObjectId(id)};
+    const result = await usersCollection.deleteOne(query);
+    res.send(result);
+  },
   changeUserRole: async(req, res)=>{
     const email = req.params.email;
     const user = req.body;

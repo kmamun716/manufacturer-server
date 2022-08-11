@@ -18,6 +18,7 @@ const {
   getOrderByUser,
   getOrderById,
   payment,
+  deleteUserById,
 } = require("../controllers/manufacturerControlers");
 const {verifyToken} = require('../middlewares/vefiryToken');
 const verifyAdmin = require("../middlewares/verifyAdmin");
@@ -65,6 +66,9 @@ router.get('/allUser', getAllUser);
 
 //get single user from database
 router.get('/user/:email', getUser);
+
+//delete user
+router.delete('/user/:id', deleteUserById)
 
 //post review
 router.post('/addReview', verifyToken, postReview);
