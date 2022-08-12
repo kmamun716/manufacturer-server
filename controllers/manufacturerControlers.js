@@ -157,6 +157,16 @@ module.exports = {
     const result = await serviceCollection.insertOne(product);
     res.send(result)
   },
+  editService: async(req, res)=>{
+    const id = req.params.id;
+    const product = req.body;
+    const filter = {_id: (ObjectId(id))};
+    const updateDoc = {
+      $set : product
+    }
+    const result = await serviceCollection.updateOne(filter, updateDoc);
+    res.send(result)
+  },
   payment: async(req, res)=>{
     const {price} = req.body;
     const amount = price*100;
@@ -166,5 +176,5 @@ module.exports = {
       payment_method_types: ['card']
     })
     res.send({clientSecret: paymentIntent.client_secret})
-  }
+  },
 };

@@ -19,6 +19,7 @@ const {
   getOrderById,
   payment,
   deleteUserById,
+  editService,
 } = require("../controllers/manufacturerControlers");
 const {verifyToken} = require('../middlewares/vefiryToken');
 const verifyAdmin = require("../middlewares/verifyAdmin");
@@ -36,6 +37,9 @@ router.put("/availableQty", availableQty);
 
 //get single service by id
 router.get("/service/:id", serviceById);
+
+//edit service
+router.put('/edit/:id', editService);
 
 //post order
 router.post("/createOrder", createOrder);
